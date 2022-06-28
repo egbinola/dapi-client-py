@@ -6,7 +6,7 @@ from dapiclient.rpc.grpc.grpc_client import GRpcClient
 
 SEED_PORT = 3000
 SEED_PORT_GRPC = 3010
-GRPC_REQUEST_TIMEOUT = 50000
+GRPC_REQUEST_TIMEOUT = 500000
 GRPC_MAX_RESULTS = 100
 
 
@@ -23,7 +23,7 @@ class DAPIClient:
         #self.forceJsonRpc = options.forceJsonRpc;
         #preconditionsUtil.checkArgument(jsutil.isUnsignedInteger(self.timeout),
         #  'Expect timeout to be an unsigned integer');
-        self.retries = 3 #options.retries ? options.retries : 3;
+        self.retries = 10 #options.retries ? options.retries : 10;
         #preconditionsUtil.checkArgument(jsutil.isUnsignedInteger(self.retries),
         #  'Expect retries to be an unsigned integer');
         #self.dpp = new DPP();
@@ -40,7 +40,7 @@ class DAPIClient:
         #print(method)
         #self.make_request['call_count'] += 1
         random_masternode = self.mn_discovery.get_random_masternode(excluded_ips)
-        #print(random_masternode)
+
         return JsonRpcClient.request({
           'host': random_masternode.split(':')[0],
           'port': self.dapi_port,

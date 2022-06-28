@@ -23,10 +23,11 @@ class JsonRpcClient:
         headers = {'content-type': 'application/json'}
 
         try:
-            response = requests.post(destination, data=json.dumps(payload), headers=headers, timeout=5000)
+            response = requests.post(destination, data=json.dumps(payload), headers=headers, timeout=50000)
             response.raise_for_status()
 
             parsed = json.loads(response.text)
+            print("Parsed response", parsed)
             #print('{} response:\n{}\n\n'.format(method, json.dumps(parsed, indent=4, sort_keys=True)))
             if 'result' in parsed:
                 return parsed['result']

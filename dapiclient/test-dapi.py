@@ -78,7 +78,7 @@ def getIdentityIdsByPublicKeyHashes(public_key_hashes, prove, seed_ip = None, mn
 def main():
 
 # Test getIdentity
-    id = base58.b58decode("Bnj59EAZAfTjeoCGWYBhp3YhLb98oQXTeMXVBcx6qNt6")
+    id = base58.b58decode("856aSH6uEBaHpndZYXDk72NJbZqXokNSPGrs8nKbd7QL")
     identity = getIdentity(id=id, prove=False, seed_ip='seed-1.testnet.networks.dash.org', mn_ip=None)
     print("Test getIdentity", str(identity))
 

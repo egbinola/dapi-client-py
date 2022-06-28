@@ -13,7 +13,7 @@ class GRpcClient:
     def __init__(self):
         pass
 
-    def request(socket, method, params = {}, options = {'timeout': 5000}):
+    def request(socket, method, params = {}, options = {'timeout': 50000}):
         channel = grpc.insecure_channel(socket, options=(('grpc.enable_http_proxy', 0),))
         #print(socket)
 
