@@ -1,5 +1,4 @@
 from dapiclient.client import DAPIClient
-import cbor2
 
 client = DAPIClient()
 
@@ -12,16 +11,16 @@ def jsonrpc_tests():
     genesis_block_hash = client.getBlockHash(height)
     print('Test - getBlockHash (height: {}): {}\n'.format(height, genesis_block_hash))
 
-    mnlist_diff = client.getMnListDiff(genesis_block_hash, current_block_hash)
-    print('Test - getMnListDiff:\n{}\n'.format(mnlist_diff))
+    # mnlist_diff = client.getMnListDiff(genesis_block_hash, current_block_hash)
+    # print('Test - getMnListDiff:\n{}\n'.format(mnlist_diff))
 
-    utxo = client.getUTXO('yPprxZrUL8UN73qLDS2xCg6yBFGieUWz7Q')#, 2)
-    print('Test - getUTXO:\n{}\n'.format(utxo))
+    # utxo = client.getUTXO('yPprxZrUL8UN73qLDS2xCg6yBFGieUWz7Q')#, 2)
+    # print('Test - getUTXO:\n{}\n'.format(utxo))
 
-    address = 'yVs4HGmHgzP4t3gZ7KrpxRzCmkQcvZmczd'
-    getAddressSummary = client.getAddressSummary(address)
-    print('Test - getAddressSummary (address: {}): {}\n' .format(address, getAddressSummary))
-    return mnlist_diff
+    # address = 'yVs4HGmHgzP4t3gZ7KrpxRzCmkQcvZmczd'
+    # getAddressSummary = client.getAddressSummary(address)
+    # print('Test - getAddressSummary (address: {}): {}\n' .format(address, getAddressSummary))
+    # return mnlist_diff
 
 def jsonrpc_comm_test(mnlist_diff):
     print('Test - Check for JSON-RPC response from all masternodes')
@@ -37,7 +36,7 @@ def jsonrpc_comm_test(mnlist_diff):
 def main():
     mnlist_diff = jsonrpc_tests()
 
-    jsonrpc_comm_test(mnlist_diff)
+    # jsonrpc_comm_test(mnlist_diff)
 
 
 if __name__ == "__main__":

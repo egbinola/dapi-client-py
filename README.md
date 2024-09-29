@@ -2,23 +2,16 @@ A very basic DAPI client. Only supports retrieving from some JSON-RPC and gRPC
 endpoints. No validation of anything. No submitting of data, tx creation,
 signing, etc.
 
-# Requirements
-
-```
-python3
-python3-venv
-```
-
 # Quickstart
 
 
 ```
-git clone https://github.com/mayoreee/dapi-client-py.git
+git clone https://github.com/thephez/dapi-client-py.git
 cd dapi-client-py
 python3 -m venv dapiclient-venv
 source dapiclient-venv/bin/activate
 pip install -r requirements.txt
-python install .
+python setup.py install
 
 # Check masternode list
 python dapiclient/test-mndiscovery.py
@@ -33,7 +26,7 @@ python dapiclient/test-dapiclient.py
 ## Layer 1
 
 ```python
-from dapiclient.client import DAPIClient
+from client import DAPIClient
 
 client = DAPIClient()
 
@@ -49,23 +42,24 @@ print(genesis_block_hash)
 ## Layer 2
 
 ```python
-from dapiclient.client import DAPIClient
+from client import DAPIClient
 import cbor2
 
 client = DAPIClient()
 
-id = client.getIdentity('C7id2mah2RkiroiTy6h134hLgS6A47jhh5x91tvw16bz')
+id = client.getIdentity('Bb2p582MFR1tQhVQHKrScsAJH6Erqsb6SoroD9dQhJ5e')
 print(id)
 
 # Retrieve DPNS contract
-contract = client.getDataContract('ARQGUnPH3YMK8FZuqwUjnTWEF6Zu4Cf3sT6e1Ruu1RXk')
+contract = client.getDataContract('2KfMcMxktKimJxAZUeZwYkFUsEcAZhDKEpQs8GMnpUse')
 print(contract)
 
 # Retrieve 5 domain names from DPNS
 docs = client.getDocuments(
-    'ARQGUnPH3YMK8FZuqwUjnTWEF6Zu4Cf3sT6e1Ruu1RXk',
-    'note',
-    limit=1
+    '2KfMcMxktKimJxAZUeZwYkFUsEcAZhDKEpQs8GMnpUse',
+    'domain',
+    limit=5,
+    start_at=2
 )
 print('{} documents retrieved'.format(len(docs)))
 for doc in docs:

@@ -1,7 +1,7 @@
 import json
 import time
-from dapiclient.rpc.jsonrpc.jsonrpc_client import JsonRpcClient
-from dapiclient.MNDiscovery.masternode_discovery import MasternodeDiscovery
+from rpc.jsonrpc.jsonrpc_client import JsonRpcClient
+from MNDiscovery.masternode_discovery import MasternodeDiscovery
 
 def main():
     mnd = MasternodeDiscovery()

@@ -1,11 +1,13 @@
+import random
 import sys
 from dapiclient.MNDiscovery.masternode_discovery import MasternodeDiscovery
 from dapiclient.rpc.jsonrpc.jsonrpc_client import JsonRpcClient
 from dapiclient.rpc.grpc.grpc_client import GRpcClient
+from dapiclient.MNDiscovery import DAPI_ADDRESSES_WHITELIST
 
 
-SEED_PORT = 3000
-SEED_PORT_GRPC = 3010
+SEED_PORT = 1443
+SEED_PORT_GRPC = 1443
 GRPC_REQUEST_TIMEOUT = 50000
 GRPC_MAX_RESULTS = 100
 
@@ -39,12 +41,13 @@ class DAPIClient:
     def make_request(self, method, params, excluded_ips = []):
         #print(method)
         #self.make_request['call_count'] += 1
-        random_masternode = self.mn_discovery.get_random_masternode(excluded_ips)
+        # random_masternode = self.mn_discovery.get_random_masternode(excluded_ips)
+        random_masternode = random.choice(DAPI_ADDRESSES_WHITELIST)
         #print(random_masternode)
         return JsonRpcClient.request({
           'host': random_masternode.split(':')[0],
-          'port': self.dapi_port,
-        }, method, params, { 'timeout': self.timeout })
+          'port': random_masternode.split(':')[1],
+        }, method, params, { 'timeout': self.timeout }, False)
 
 
     def make_request_to_node(self, method, params, ip):
@@ -107,12 +110,14 @@ class DAPIClient:
     def make_request_to_random_dapi_grpc_node(self, method, retries_count, params = {}, options = {}, excluded_ips = []):
         #self.make_request['call_count'] = 0;
         if (self.mn_ip is None):
-             random_masternode = self.mn_discovery.get_random_masternode()
+            #  random_masternode = self.mn_discovery.get_random_masternode()
+             random_masternode = random.choice(DAPI_ADDRESSES_WHITELIST).split(':')[0]
              ip = random_masternode
         else:
              ip = self.mn_ip
 
         socket = '{}:{}'.format(ip, self.native_grpc_port)
+        # socket = self.mn_ip
         options = {
             'timeout': GRPC_REQUEST_TIMEOUT
         }

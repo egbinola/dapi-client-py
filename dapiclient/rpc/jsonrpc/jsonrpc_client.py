@@ -9,9 +9,9 @@ class JsonRpcClient:
         return
 
 
-    def request(url, method, params = {}, options = {}):
+    def request(url, method, params = {}, options = {}, verify_ssl=True):
         #print(url)
-        destination = 'http://{}:{}'.format(url['host'], url['port'])
+        destination = 'https://{}:{}'.format(url['host'], url['port'])
 
         payload = {
             'jsonrpc': RPC_VERSION,
@@ -23,7 +23,7 @@ class JsonRpcClient:
         headers = {'content-type': 'application/json'}
 
         try:
-            response = requests.post(destination, data=json.dumps(payload), headers=headers, timeout=5000)
+            response = requests.post(destination, data=json.dumps(payload), headers=headers, timeout=5000, verify=verify_ssl)
             response.raise_for_status()
 
             parsed = json.loads(response.text)

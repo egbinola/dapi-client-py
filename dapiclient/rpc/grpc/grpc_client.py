@@ -14,8 +14,14 @@ class GRpcClient:
         pass
 
     def request(socket, method, params = {}, options = {'timeout': 5000}):
-        channel = grpc.insecure_channel(socket, options=(('grpc.enable_http_proxy', 0),))
-        #print(socket)
+        # Create insecure credentials that don't validate the server certificate
+        credentials = grpc.ssl_channel_credentials(root_certificates=None)
+        channel = grpc.secure_channel(
+            socket,  # e.g., 'yourserver.com:443'
+            credentials,
+            options=(('grpc.enable_http_proxy', 0),))
+       
+        # print('socket: {}'.format(socket))
 
         stub = platform_pb2_grpc.PlatformStub(channel)
         stubCore = core_pb2_grpc.CoreStub(channel)
@@ -59,52 +65,71 @@ class GRpcClient:
 
     def getIdentity(stub, params, options):
         # Create Identity request
-        identity_request = platform_pb2.GetIdentityRequest()
+        identity_request_v0 = platform_pb2.GetIdentityRequest.GetIdentityRequestV0()
+
         # Set identity parameter of request
-        identity_request.id = params['id'] 
-        identity_request.prove = params['prove']
-       
+        identity_request_v0.id = params['id'] 
+        identity_request_v0.prove = params['prove']
+
+        # Create GetIdentityRequest instance and set version v0 to identity_request_v0
+        identity_request = platform_pb2.GetIdentityRequest()
+        identity_request.v0.CopyFrom(identity_request_v0)
+
         response = stub.getIdentity(identity_request, options['timeout'])
-
-        responseBytes = bytearray(response.identity)
-        identityBytes = responseBytes[4 : len(responseBytes)]
-
-
-        return cbor2.loads(identityBytes)
-
+        responseBytes = bytearray(response.v0.identity)
+        # identityBytes = responseBytes[4 : len(responseBytes)]
+        # return cbor2.loads(identityBytes)
+        return responseBytes
 
     def getDataContract(stub, params, options):
+        # Create a version-specific GetDataContractRequestV0 message
+        contract_request_v0 = platform_pb2.GetDataContractRequest.GetDataContractRequestV0()
+        contract_request_v0.id = params['id']
+        contract_request_v0.prove = params['prove']
+
+        # Create the GetDataContractRequest message and set the v0 field
         contract_request = platform_pb2.GetDataContractRequest()
-        contract_request.id = params['id'],
-        contract_request.prove = params['prove']
+        contract_request.v0.CopyFrom(contract_request_v0)
 
+        # Send the request and receive the response
         response = stub.getDataContract(contract_request, options['timeout'])
-        #print('Data Contract: {}\n'.format(cbor2.loads(response.data_contract)))
-
-        return cbor2.loads(response.data_contract)
+        return response.v0.data_contract
 
 
     def getDocuments(stub, params, options):
-        #print(params)
+        # Create the version-specific GetDocumentsRequestV0 message
+        document_request_v0 = platform_pb2.GetDocumentsRequest.GetDocumentsRequestV0()
 
+        # Set required fields
+        document_request_v0.data_contract_id = params['data_contract_id']
+        document_request_v0.document_type = params['document_type']
+        
+        # Check and set optional fields if present in params
+        if params.get('where'):
+            document_request_v0.where = params['where']
+            
+        if params.get('order_by'):
+            document_request_v0.order_by = params['order_by']
+            
+        if params.get('limit') is not None:
+            document_request_v0.limit = params['limit']
+        
+        # Handle oneof start (either start_at or start_after)
+        if params.get('start_after'):
+            document_request_v0.start_after = params['start_after']
+        elif params.get('start_at'):
+            document_request_v0.start_at = params['start_at']
+
+        document_request_v0.prove = params['prove']
+
+        # Create the GetDocumentsRequest message and set the v0 field
         document_request = platform_pb2.GetDocumentsRequest()
-        document_request.data_contract_id = params['data_contract_id']
-        document_request.document_type =  params['document_type']
-        document_request.where = params['where']
-        document_request.order_by = params['order_by']
-        document_request.limit =  params['limit']
-        document_request.start_at =  params['start_at']
-        document_request.start_after = params['start_after']
-        document_request.prove = params['prove']
+        document_request.v0.CopyFrom(document_request_v0)
 
+        # Send the request and receive the response
         response = stub.getDocuments(document_request, options['timeout'])
-
-        documents = []
-        for doc in response.documents:
-             docBytes = doc[4 : len(doc)]
-             documents.append(cbor2.loads(docBytes))
-             
-        return documents
+        # print(response)
+        return response.v0.documents
 
     def getBlock(stubCore, params, options):
         block_request = core_pb2.GetBlockRequest()

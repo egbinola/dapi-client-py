@@ -1,15 +1,16 @@
 import hashlib
 import importlib
+import random
 from logging import Handler
 from dapiclient.client import DAPIClient
-from thumbor.handlers.imaging import ImagingHandler
-from thumbor_dash.error_handlers.sentry import ErrorHandler
-from thumbor_dash.error_handlers import *
+# from thumbor.handlers.imaging import ImagingHandler
+# from thumbor_dash.error_handlers.sentry import ErrorHandler
+# from thumbor_dash.error_handlers import *
 
-import cbor2
 import base58
 from hashlib import sha256
 from binascii import hexlify, unhexlify
+from dapiclient.MNDiscovery import DAPI_ADDRESSES_WHITELIST
 
 
 def getIdentity(id, prove, seed_ip = None, mn_ip = None):
@@ -48,7 +49,7 @@ def getDocuments(handler, data, prove, seed_ip = None, mn_ip = None):
     except Exception as e:
         return e
     else:
-        return docs[0]# Return the only document in the list
+        return docs
 
 
 def getIdentitiesByPublicKeyHashes(public_key_hashes, prove, seed_ip = None, mn_ip = None):
@@ -76,58 +77,30 @@ def getIdentityIdsByPublicKeyHashes(public_key_hashes, prove, seed_ip = None, mn
 
 
 def main():
+    CONTRACT_ID = "GWRSAVFMjXx8HpQFaNJMqBV7MBgMK4br5UESsB4S31Ec"
 
-# Test getIdentity
-    id = base58.b58decode("Bnj59EAZAfTjeoCGWYBhp3YhLb98oQXTeMXVBcx6qNt6")
-    identity = getIdentity(id=id, prove=False, seed_ip='seed-1.testnet.networks.dash.org', mn_ip=None)
+    # Test getIdentity
+    id = base58.b58decode("GgZekwh38XcWQTyWWWvmw6CEYFnLU7yiZFPWZEjqKHit")
+    identity = getIdentity(id=id, prove=False)
     print("Test getIdentity", str(identity))
 
-# Tet getDataContract
-    contract_id = base58.b58decode("EC7HZ6itSLiCmYsdR1gnqkxP1UWEaruQR2zdERHhgNfW")
-    data_contract = getDataContract(contract_id=contract_id, prove=False, seed_ip='seed-1.testnet.networks.dash.org', mn_ip=None)
+    # Test getDataContract
+    contract_id = base58.b58decode(CONTRACT_ID)
+    data_contract = getDataContract(contract_id=contract_id, prove=False, seed_ip=None, mn_ip=None)
     print ("Test getDataContract", str(data_contract))
 
-# Test getDocuments
+    # Test getDocuments
     data = {
-        'contract_id': base58.b58decode('EC7HZ6itSLiCmYsdR1gnqkxP1UWEaruQR2zdERHhgNfW'),
-        'document_type': 'note',
+        'contract_id': base58.b58decode(CONTRACT_ID),
+        'document_type': 'domain',
         'where': b''
     }
-    docs = getDocuments(handler=ErrorHandler,data=data,prove=False, seed_ip='seed-1.testnet.networks.dash.org', mn_ip=None)    
-    print("Test getDocuments", str(docs))
-
-# Test getIdentitiesByPublicKeyHashes
-    public_key = b'''{
-      'id': 0,
-      'type': 0,
-      'purpose': 0,
-      'securityLevel': 0,
-      'data': 'AxC5a+d0ocvhrdl+j86JF6aDpUY7TQG1t6ujvS6pYZjk',
-      'readOnly': False,
-    }'''
-    public_key_hash = sha256(sha256(public_key).digest()).digest()
-    public_key_hashes = [public_key_hash]
-    identities = getIdentitiesByPublicKeyHashes(public_key_hashes=public_key_hashes, prove=False, seed_ip='seed-1.testnet.networks.dash.org', mn_ip=None)
-    print("Test getIdentitiesByPublicKeyHashes", str(identities))
-
-# Test getIdentityIdsByPublicKeyHashes
-    public_key = b'''{
-      'id': 0,
-      'type': 0,
-      'purpose': 0,
-      'securityLevel': 0,
-      'data': 'AxC5a+d0ocvhrdl+j86JF6aDpUY7TQG1t6ujvS6pYZjk',
-      'readOnly': False,
-    }'''
-    public_key_hash = sha256(sha256(public_key).digest()).digest()
-    public_key_hashes = [public_key_hash]
-    identities = getIdentityIdsByPublicKeyHashes(public_key_hashes=public_key_hashes, prove=False, seed_ip='seed-1.testnet.networks.dash.org', mn_ip=None)
-    print("Test getIdentityIdsByPublicKeyHashes", str(identities))
+    docs = getDocuments(handler=Handler,data=data,prove=False, seed_ip=None, mn_ip=None)    
+    print("Test getDocuments", docs)
 
    
 if __name__ == "__main__":
     main()
-
 
 
 
