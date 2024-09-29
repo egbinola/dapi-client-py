@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="dapiclient",
-    version="0.0.7",
+    version="1.3.0",
     description="A Python client SDK for DASH Platform",
     long_description=open('README.md').read(),  # Assuming you have a README.md
     long_description_content_type="text/markdown",
