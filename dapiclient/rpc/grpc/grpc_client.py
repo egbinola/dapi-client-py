@@ -28,6 +28,9 @@ class GRpcClient:
 
         if method == 'getIdentity':
             return GRpcClient.getIdentity(stub, params, options)
+        
+        if method == 'getIdentityKeys':
+            return GRpcClient.getIdentityKeys(stub, params, options)
 
         elif method == 'getDataContract':
             return GRpcClient.getDataContract(stub, params, options)
@@ -81,8 +84,41 @@ class GRpcClient:
         # return cbor2.loads(identityBytes)
         return responseBytes
 
+
+    def getIdentityKeys(stub, params, options):
+        # Create Identity Keys request
+        identity_key_request_v0 = platform_pb2.GetIdentityKeysRequest.GetIdentityKeysRequestV0()
+
+        # Populate required fields
+        identity_key_request_v0.identity_id = params['id']  # Set identity_id to the id parameter
+        # Create a KeyRequestType instance (assuming it uses `oneof`)
+        request_type = identity_key_request_v0.request_type
+
+        # Set the specific request type you want
+        # For example, to request all keys, do:
+        request_type.all_keys.CopyFrom(platform_pb2.AllKeys())  # Adjust based on your actual message structure
+
+        # Optional pagination fields
+        identity_key_request_v0.limit.value = params.get('limit', 5)  # Default limit
+        identity_key_request_v0.offset.value = params.get('offset', 0)  # Default offset
+        identity_key_request_v0.prove = params.get('prove', False)  # Default to False
+
+        # Create GetIdentityKeysRequest instance and set version v0 to identity_key_request_v0
+        identity_key_request = platform_pb2.GetIdentityKeysRequest()
+        identity_key_request.v0.CopyFrom(identity_key_request_v0)
+
+        # Call the gRPC method
+        response = stub.getIdentityKeys(identity_key_request, options['timeout'])
+        keys_object = response.v0.keys  # Access the Keys object
+
+        # Access the keys_bytes attribute
+        keys_bytes_str = keys_object.keys_bytes
+        
+        return keys_bytes_str
+
+
     def getDataContract(stub, params, options):
-        # Create a version-specific GetDataContractRequestV0 message
+        # Create a version-specific RequestV0 message
         contract_request_v0 = platform_pb2.GetDataContractRequest.GetDataContractRequestV0()
         contract_request_v0.id = params['id']
         contract_request_v0.prove = params['prove']

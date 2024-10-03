@@ -191,6 +191,16 @@ class DAPIClient:
                     'prove': prove,
                 }
             )
+    
+    def getIdentityKeys(self, id, prove):
+        return self.make_request_to_random_dapi_grpc_node(
+                'getIdentityKeys',
+                self.retries,
+                {
+                    'id': id,
+                    'prove': prove,
+                }
+            )
 
     def getDataContract(self, id, prove):
         return self.make_request_to_random_dapi_grpc_node(
